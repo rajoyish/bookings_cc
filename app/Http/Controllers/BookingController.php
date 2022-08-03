@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Bookings\TimeSlotGenerator;
-use App\Models\Schedule;
 use App\Models\Service;
+use App\Models\Schedule;
 use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
+use App\Bookings\TimeSlotGenerator;
+use App\Bookings\Filters\SlotsPassedTodayFilter;
 
 class BookingController extends Controller
 {
@@ -16,10 +17,14 @@ class BookingController extends Controller
         // $slots = CarbonInterval::days(1)
         //     ->toPeriod(now(), now()->addYear());
 
-        $schedule = Schedule::find(3);
+        $schedule = Schedule::find(2);
         $service = Service::find(2);
 
-        $slots = (new TimeSlotGenerator($schedule, $service))->get();
+        $slots = (new TimeSlotGenerator($schedule, $service))
+            ->applyFilters(
+                [new SlotsPassedTodayFilter()]
+            )
+            ->get();
 
 
         // dd($slots);
