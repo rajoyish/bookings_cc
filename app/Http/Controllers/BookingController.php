@@ -12,6 +12,7 @@ use App\Models\ScheduleUnavailability;
 use App\Bookings\Filters\UnavailabilityFilter;
 use App\Bookings\Filters\SlotsPassedTodayFilter;
 use App\Models\Appointment;
+use App\Models\Employee;
 
 class BookingController extends Controller
 {
@@ -21,21 +22,12 @@ class BookingController extends Controller
         // $slots = CarbonInterval::days(1)
         //     ->toPeriod(now(), now()->addYear());
 
-        $schedule = Schedule::find(1);
+        $schedule = Schedule::find(2);
         $service = Service::find(1);
 
-        $appointments = Appointment::whereDate('date', '2022-07-29')->get();
+        $employee = Employee::find(1);
 
-        $slots = (new TimeSlotGenerator($schedule, $service))
-            ->applyFilters(
-                [
-                    new SlotsPassedTodayFilter(),
-                    new UnavailabilityFilter($schedule->unavailabilities),
-                    new AppointmentFilter($appointments)
-
-                ]
-            )
-            ->get();
+        $slots = $employee->availableTimeSlots($schedule, $service);
 
 
         // dd($slots);
